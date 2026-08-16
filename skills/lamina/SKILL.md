@@ -153,5 +153,3 @@ and the pipeline will stop before another step; `not_cancellable` is not equival
   `lamina_topup` tool only issues a Stripe-hosted checkout URL.
 - Keep brand/profile changes, app visibility, version restore, feedback, refinement, and
   checkout as explicit advanced actions with user authorization.
-
-<!-- sync-verification-marker: will be removed by the sync workflow -->
