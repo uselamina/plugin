@@ -14,7 +14,7 @@
       "category": "productivity",
       "keywords": ["image-generation", "video", "audio", "creative", "media"],
       "author": { "name": "Lamina", "url": "https://uselamina.ai" },
-      "homepage": "https://uselamina.ai/developers",
+      "homepage": "https://uselamina.ai/agents",
       "repository": "https://github.com/uselamina/plugin",
       "license": "MIT"
     }

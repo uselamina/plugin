@@ -37,7 +37,7 @@ Update later with:
 ## Links
 
 - Product: https://uselamina.ai
-- Developers: https://uselamina.ai/developers
+- Developers: https://uselamina.ai/agents
 
 ## License
 
