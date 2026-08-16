@@ -1,0 +1,83 @@
+# PROPOSED workflow for the PRIVATE monorepo (cirbuk/react-flow-integration).
+# Copy this to `.github/workflows/sync-plugin-skill.yml` in the monorepo.
+#
+# Purpose: the monorepo's packages/skill/SKILL.md is the source of truth. On each
+# skill release (tag `skill-v*` — the same trigger as publish-skill.yml), mirror
+# SKILL.md + references into the PUBLIC plugin repo (uselamina/plugin) so the
+# Claude-directory listing never drifts from npm.
+#
+# ONE-TIME SETUP (before first release):
+#   1. Create the public repo uselamina/plugin with the scaffold in this folder.
+#   2. Create a push credential and add it as a repo secret on the MONOREPO:
+#        - Preferred: a GitHub App or fine-grained PAT with `contents:write`
+#          scoped to uselamina/plugin, stored as secret PLUGIN_REPO_TOKEN.
+#        - Or a deploy key on uselamina/plugin + SSH; adjust the checkout/push.
+#   3. Confirm the paths below match the public repo layout (skills/lamina/...).
+
+name: Sync plugin skill
+
+on:
+  push:
+    tags:
+      - 'skill-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout monorepo (source of truth)
+        uses: actions/checkout@v5
+        with:
+          path: monorepo
+
+      - name: Checkout public plugin repo
+        uses: actions/checkout@v5
+        with:
+          repository: uselamina/plugin
+          token: ${{ secrets.PLUGIN_REPO_TOKEN }}
+          path: plugin
+
+      - name: Mirror SKILL.md + references
+        run: |
+          set -e
+          SRC="monorepo/packages/skill"
+          DST="plugin/skills/lamina"
+          mkdir -p "$DST/references"
+          cp "$SRC/SKILL.md" "$DST/SKILL.md"
+          rm -rf "$DST/references"
+          mkdir -p "$DST/references"
+          cp -R "$SRC/references/." "$DST/references/"
+
+      - name: Bump plugin version to match skill release
+        run: |
+          set -e
+          VERSION="${GITHUB_REF_NAME#skill-v}"
+          node -e '
+            const fs = require("fs");
+            for (const p of ["plugin/.claude-plugin/plugin.json", "plugin/.claude-plugin/marketplace.json"]) {
+              const j = JSON.parse(fs.readFileSync(p, "utf8"));
+              if (p.endsWith("plugin.json")) j.version = process.env.VERSION;
+              if (j.plugins) j.plugins = j.plugins.map(x => ({ ...x, version: process.env.VERSION }));
+              fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+            }
+          '
+        env:
+          VERSION: ${{ github.ref_name }}
+
+      - name: Commit and push if changed
+        working-directory: plugin
+        run: |
+          set -e
+          git config user.name "lamina-bot"
+          git config user.email "bot@uselamina.ai"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "sync: skill ${GITHUB_REF_NAME#skill-} from monorepo"
+            git push
+          else
+            echo "No changes to sync."
+          fi

@@ -1,0 +1,17 @@
+{
+  "name": "lamina",
+  "displayName": "Lamina",
+  "description": "Creative director for AI image, video, audio & narrated multi-shot video — plan → approve → execute, budget-bounded and brand-aware.",
+  "version": "0.1.0",
+  "author": { "name": "Lamina", "url": "https://uselamina.ai" },
+  "homepage": "https://uselamina.ai/developers",
+  "repository": "https://github.com/uselamina/plugin",
+  "license": "MIT",
+  "keywords": ["image-generation", "video", "audio", "creative", "media", "mcp", "generative-ai"],
+  "mcpServers": {
+    "uselamina": {
+      "type": "http",
+      "url": "https://app.uselamina.ai/mcp/agent/v2"
+    }
+  }
+}

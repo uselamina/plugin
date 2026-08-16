@@ -1,0 +1,22 @@
+{
+  "name": "lamina",
+  "description": "Lamina's creative-director tools for AI image, video, audio & narrated multi-shot video.",
+  "owner": {
+    "name": "Lamina",
+    "url": "https://uselamina.ai"
+  },
+  "plugins": [
+    {
+      "name": "lamina",
+      "source": "./",
+      "displayName": "Lamina",
+      "description": "Creative director for AI image, video, audio & narrated multi-shot video — plan → approve → execute.",
+      "category": "productivity",
+      "keywords": ["image-generation", "video", "audio", "creative", "media"],
+      "author": { "name": "Lamina", "url": "https://uselamina.ai" },
+      "homepage": "https://uselamina.ai/developers",
+      "repository": "https://github.com/uselamina/plugin",
+      "license": "MIT"
+    }
+  ]
+}
