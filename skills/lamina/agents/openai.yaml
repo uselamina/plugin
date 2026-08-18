@@ -1,0 +1,15 @@
+interface:
+  display_name: 'Lamina Creative Workflows'
+  short_description: 'Plan and run brand-aware creative workflows'
+  default_prompt: 'Use $lamina to plan an approved, budget-bounded creative workflow from my brief.'
+
+dependencies:
+  tools:
+    - type: 'mcp'
+      value: 'lamina'
+      description: 'Lamina task-level creative MCP server'
+      transport: 'streamable_http'
+      url: 'https://app.uselamina.ai/mcp/agent/openai'
+
+policy:
+  allow_implicit_invocation: true

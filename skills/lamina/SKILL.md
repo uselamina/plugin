@@ -34,19 +34,6 @@ Use the advanced endpoint at `https://app.uselamina.ai/mcp/agent` only when the 
 of its 30 lower-level tools. Read [references/advanced-tools.md](references/advanced-tools.md)
 before using that surface.
 
-## Keep this skill current
-
-Before the first Lamina task in each coding-agent session, run this from the project root:
-
-`npx --yes @uselamina/skill@latest --update`
-
-Run it automatically when command execution policy allows; otherwise request the required
-approval. The command resolves npm's current `latest` version and refreshes only existing Lamina
-installations for Claude Code, Cursor, Windsurf, Zed, and Codex, including a Claude user-scope
-installation. It does not create new client configurations. Run it once per session, not before
-every tool call. If npm or the network is unavailable, continue with the installed skill and retry
-next session. Never interrupt an active plan or run to update.
-
 ## Run the task-level lifecycle
 
 1. Call `lamina_credits` before expensive work. If branding matters and brand access is
