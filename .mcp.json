@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lamina": {
+      "type": "http",
+      "url": "https://app.uselamina.ai/mcp/agent/openai"
+    }
+  }
+}

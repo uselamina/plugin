@@ -1,8 +1,8 @@
 # Lamina advanced MCP tools
 
 Use this reference only with `https://app.uselamina.ai/mcp/agent`. The endpoint exposes the 30
-tools below for direct control. Prefer the seven-tool v2 endpoint for ordinary requests and
-multi-step pipelines.
+tools below for direct control. Prefer the nine-tool curated OpenAI endpoint for ordinary
+requests and multi-step pipelines; existing v2 clients retain the same task-level contract.
 
 ## Contents
 
@@ -108,11 +108,14 @@ families; feedback, stored compliance, and refinement still require workflow pro
 
 ## Generated-app management
 
-| Tool                       | Main inputs                                                                                                     | Use and side effects                                                                                                                                                                                                                             |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `lamina_generate_workflow` | `instruction?`; `baseAppId?`, `ops?`, `name?`, `visibility?`, `provider?`, `brandProfileId?`, `run?`, `inputs?` | Create a private app or edit a generated app in place. `ops` requires `baseAppId` and is the deterministic edit path; otherwise supply an instruction. `run: true` can dispatch immediately, so obtain approval for both creation and execution. On the planner path the response may include `editability` `{ score (0–1), subscores, notes[] }` — a deterministic measure of how tweakable the app is; a low score plus its `notes` is a cue to offer the user a refinement (via `ops`/`instruction`). |
-| `lamina_app_versions`      | `appId`; `restore?`                                                                                             | Omit `restore` to list versions (read). Supplying a version restores it (write), snapshots the current graph first, and requires elevated ownership. Confirm before restore.                                                                     |
-| `lamina_set_visibility`    | `appId`, `visibility`                                                                                           | Change reach to `private`, `shared`, or `public`. This is a publication mutation; confirm the exact audience.                                                                                                                                    |
+| Tool                       | Main inputs                                                                                      | Use and side effects                                                                                                                                                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `lamina_generate_workflow` | `instruction?`; `baseAppId?`, `ops?`, `name?`, `provider?`, `brandProfileId?`, `run?`, `inputs?` | Create a private app or edit a generated app in place. `ops` requires `baseAppId` and is the deterministic edit path; otherwise supply an instruction. `run: true` can dispatch immediately, so obtain approval for both creation and execution. On the planner path the response may include `editability` `{ score (0–1), subscores, notes[] }` — a deterministic measure of how tweakable the app is; a low score plus its `notes` is a cue to offer the user a refinement (via `ops`/`instruction`). |
+| `lamina_app_versions`      | `appId`; `restore?`                                                                              | Omit `restore` to list versions (read). Supplying a version restores it (write), snapshots the current graph first, and requires elevated ownership. Confirm before restore.                                                                     |
+| `lamina_set_visibility`    | `appId`, `visibility`                                                                            | Change reach to `private`, `shared`, or `public`. This is a publication mutation; confirm the exact audience.                                                                                                                                    |
+
+New apps created by `lamina_generate_workflow` are always private. Sharing or publishing is a
+separate `lamina_set_visibility` action and requires explicit user approval.
 
 After generating or editing an app, use the returned parameter keys rather than assuming its
 old schema. If `run` was not approved, leave it false and call `lamina_run` only after inputs
