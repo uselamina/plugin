@@ -11,16 +11,21 @@ user needs direct control over a particular app, model, brand mutation, or payme
 
 ## Connect
 
-Prefer the hosted OAuth MCP server:
+For OpenAI and Codex, prefer the curated hosted OAuth MCP server:
 
-`https://app.uselamina.ai/mcp/agent/v2`
+`https://app.uselamina.ai/mcp/agent/openai`
 
-It exposes seven task-level tools:
+Existing Claude and other v2 clients can continue using
+`https://app.uselamina.ai/mcp/agent/v2`; it preserves the same task-level contract and also
+registers Lamina's editor/player app tools. The curated OpenAI endpoint exposes exactly nine
+task-level tools:
 
 - `lamina_plan`
+- `lamina_choose`
 - `lamina_execute`
 - `lamina_status`
 - `lamina_cancel`
+- `lamina_steer`
 - `lamina_upload_asset`
 - `lamina_brand_context`
 - `lamina_credits`
@@ -42,7 +47,7 @@ installation. It does not create new client configurations. Run it once per sess
 every tool call. If npm or the network is unavailable, continue with the installed skill and retry
 next session. Never interrupt an active plan or run to update.
 
-## Run the v2 lifecycle
+## Run the task-level lifecycle
 
 1. Call `lamina_credits` before expensive work. If branding matters and brand access is
    available, call `lamina_brand_context` first. Do not invent missing brand attributes.
@@ -57,12 +62,15 @@ next session. Never interrupt an active plan or run to update.
    brand-read permission.
 
 3. If `status` is `needs_clarification`, ask `questions[]` and plan again with the clarified
-   brief. If the frozen plan is `awaiting_approval`, collect each `requiredInputs[].question`
-   and keep those answers for `lamina_execute`; do not re-plan and drift away from the plan the
-   user will approve. Do not execute an unresolved or expired plan.
-4. Show the user the frozen steps, outputs, warnings, and credit estimate. Obtain explicit
+   brief. If it is `awaiting_choice`, show every alternative with its credit/time estimate, let
+   the user choose, and call `lamina_choose({ planId, routeId })`. Execute only the chosen plan
+   returned as `awaiting_approval`.
+4. If the frozen plan is `awaiting_approval`, collect each `requiredInputs[].question` and keep
+   those answers for `lamina_execute`; do not re-plan and drift away from the plan the user will
+   approve. Do not execute an unresolved or expired plan.
+5. Show the user the frozen steps, outputs, warnings, and credit estimate. Obtain explicit
    approval before spending.
-5. Execute the exact approved plan:
+6. Execute the exact approved plan:
 
    `lamina_execute({ planId, planFingerprint, inputs, maxCredits, allowUnknownCost?, idempotencyKey })`
 
@@ -71,9 +79,10 @@ next session. Never interrupt an active plan or run to update.
    the unknown-cost warning and receiving approval. Reuse one idempotency key only for an exact
    retry; use a new key when inputs, plan, or budget change.
 
-6. Poll `lamina_status({ runId, wait: true, timeoutSeconds? })` until terminal. A wait can time
-   out with a current non-terminal snapshot; call it again. Surface meaningful progress.
-7. Return the output URLs and a concise result summary. Do not claim success from a queued or
+7. Call `lamina_status({ runId, wait: true, timeoutSeconds? })` once after execution. Its OpenAI
+   status card refreshes itself and morphs into the finished result, so do not poll and stack
+   duplicate cards. Call it again only if the user explicitly requests a later re-check.
+8. Return the output URLs and a concise result summary. Do not claim success from a queued or
    running response.
 
 Lamina resolves references between plan steps server-side. Do not manually copy an earlier
@@ -134,13 +143,18 @@ to steer routing (see Gotchas).
 
 ## Status and cancellation
 
-Treat v2 `lamina_status` as universal across pipeline, app-workflow, atomic image/video, and
+Treat task-level `lamina_status` as universal across pipeline, app-workflow, atomic image/video, and
 compose runs. Pass every `runId` back exactly as returned.
 
 Use `lamina_cancel({ runId })` when the user asks to stop work. Cancellation is idempotent but
 provider-dependent: `cancel_requested` can mean the active provider call cannot be interrupted
 and the pipeline will stop before another step; `not_cancellable` is not equivalent to
 `cancelled`.
+
+Use `lamina_steer({ runId, feedback })` for feedback on a running render. A knob change is folded
+into remaining work; a structural change can stop the run and return `replan_required` with
+completed outputs to reuse. When that happens, re-plan with the returned carry-forward context
+instead of silently restarting or charging again.
 
 ## Safety boundaries
 
@@ -149,7 +163,7 @@ and the pipeline will stop before another step; `not_cancellable` is not equival
 - Never reuse an idempotency key for changed work.
 - Never guess model IDs, app inputs, option labels, URLs, brand facts, or subject-defining
   assets.
-- Never collect card details. The v2 surface does not create checkout; the advanced
+- Never collect card details. The task-level surface does not create checkout; the advanced
   `lamina_topup` tool only issues a Stripe-hosted checkout URL.
 - Keep brand/profile changes, app visibility, version restore, feedback, refinement, and
   checkout as explicit advanced actions with user authorization.
