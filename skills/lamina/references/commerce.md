@@ -1,4 +1,4 @@
-# Lamina Commerce
+# Brand MCP
 
 ## Connection
 
@@ -50,7 +50,7 @@ tool prepares its complete output pack, including video; there is no image-only 
 5. Poll `commerce_status` with bounded intervals until completed, failed or cancelled.
    A running response can contain no outputs even at 100% step progress. On uncertain
    dispatch, retry exactly the same execute arguments/key instead of creating a new run.
-6. Deliver the final `outputs[].url` values from MCP. Inspect those media files before
+6. Present the returned media from MCP, retaining named original-file links. Inspect those media files before
    describing quality; `verification: verified` checks structure/provenance, not visual
    correctness. Do not replace missing MCP results with saved canvas/database outputs.
 
@@ -59,5 +59,27 @@ If the app's authored graph changes, an operator may need to refresh its reviewe
 contract before a newly prepared run is allowed. Exact per-run settled credits may be
 unavailable; do not substitute a concurrent workspace balance difference.
 
-Commerce does not publish to Shopify. The agent may use its own authorized Shopify
+Brand MCP does not publish to Shopify. The agent may use its own authorized Shopify
 connector to publish returned files when the user requests that action.
+
+## Present references and outputs
+
+Preserve labelled `image` content blocks and `resource_link` blocks from describe,
+prepare and status. Printing only JSON/`structuredContent` hides the previews from
+humans. Use the host's actual media display API. MCP Apps hosts can mount the Brand
+gallery/player; native-image hosts can show thumbnails and use their video preview
+tool. Text-only hosts need named original-file links and an explicit display limitation.
+Do not say “shown above” unless a visible surface was actually produced. Do not rely
+only on remote Markdown image tables or download files to bypass display restrictions.
+
+All photos and outputs appear in `presentation.items`, with labels, IDs and original
+URLs. Embedded thumbnails are capped at four per call. To show later photos, pass
+`app_key` and `preview_preset_ids` to describe, or `runId` and `preview_output_ids` to
+status. Use IDs from that response. `inlinePreview: included` means the response has
+an image block, not proof of human-visible rendering. Unavailable thumbnails do not
+mean generation failed. Preserve failed/cancelled status with any partial outputs.
+
+Show the exact selected preset/custom reference in the preparation review. Choosing
+a gallery photo requests preparation, never execution. Refresh the existing run to
+retrieve results without generating again. After a presentation update, reload tool
+and resource discovery; existing OAuth grants and endpoint/tool names remain valid.

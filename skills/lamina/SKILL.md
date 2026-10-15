@@ -9,9 +9,15 @@ Use Lamina's task-level MCP endpoint to turn a brief into an approved, budget-bo
 pipeline. Let Lamina select and stitch apps or models; use the advanced endpoint only when the
 user needs direct control over a particular app, model, brand mutation, or payment action.
 
-## Commerce apps
+## Brand MCP apps
 
-For the six Lamina Commerce apps (catalogue, listing upgrade, banners, customer try-on,
+Show returned photos and outputs using the host's gallery/player or native media API.
+Preserve labelled MCP image blocks and resource links; JSON alone does not display
+media. Never claim “shown above” without a visible preview. If unsupported, provide
+named original links and explain the display limitation. Refresh status without
+regenerating. See the Brand reference for paging beyond four thumbnails.
+
+For the six Brand MCP apps (catalogue, listing upgrade, banners, customer try-on,
 apparel film and non-apparel film), use the separate OAuth connection
 `https://app.uselamina.ai/mcp/commerce`. It is not a sub-tool automatically enabled by
 connecting to the main endpoint. Read [references/commerce.md](references/commerce.md)
@@ -22,9 +28,9 @@ through the connected MCP resource reader.
 Use `commerce_credits` → `commerce_describe` → the matching `commerce_prepare_*` tool →
 review/authorization → `commerce_execute` → `commerce_status`. Supply product data from
 the user's existing connector or files; do not ask them to reconnect Shopify to Lamina.
-Commerce person presets/custom photos are not AI-model overrides: internal generation
+Brand MCP person presets/custom photos are not AI-model overrides: internal generation
 models remain fixed. The task-level planner, model-selection recipes and status-card
-polling rules below apply to the main endpoint, not to Commerce. Commerce requires
+polling rules below apply to the main endpoint, not to Brand MCP. Brand MCP requires
 bounded status checks until a terminal response; return its actual final outputs.
 
 ## Connect
