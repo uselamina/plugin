@@ -9,6 +9,24 @@ Use Lamina's task-level MCP endpoint to turn a brief into an approved, budget-bo
 pipeline. Let Lamina select and stitch apps or models; use the advanced endpoint only when the
 user needs direct control over a particular app, model, brand mutation, or payment action.
 
+## Commerce apps
+
+For the six Lamina Commerce apps (catalogue, listing upgrade, banners, customer try-on,
+apparel film and non-apparel film), use the separate OAuth connection
+`https://app.uselamina.ai/mcp/commerce`. It is not a sub-tool automatically enabled by
+connecting to the main endpoint. Read [references/commerce.md](references/commerce.md)
+for setup and app selection; obtain current fields and choices from `commerce_describe`.
+If the host only installed this rule text without references, read `commerce://guide`
+through the connected MCP resource reader.
+
+Use `commerce_credits` → `commerce_describe` → the matching `commerce_prepare_*` tool →
+review/authorization → `commerce_execute` → `commerce_status`. Supply product data from
+the user's existing connector or files; do not ask them to reconnect Shopify to Lamina.
+Commerce person presets/custom photos are not AI-model overrides: internal generation
+models remain fixed. The task-level planner, model-selection recipes and status-card
+polling rules below apply to the main endpoint, not to Commerce. Commerce requires
+bounded status checks until a terminal response; return its actual final outputs.
+
 ## Connect
 
 For OpenAI and Codex, prefer the curated hosted OAuth MCP server:
@@ -48,10 +66,15 @@ before using that surface.
    pass the returned `brandProfileId`; Lamina ignores it and warns if the OAuth token lacks
    brand-read permission.
 
-3. If `status` is `needs_clarification`, ask `questions[]` and plan again with the clarified
-   brief. If it is `awaiting_choice`, show every alternative with its credit/time estimate, let
+3. If `status` is `needs_clarification`, render the typed `questions[]` and submit the answers as
+   an immutable child revision:
+
+   `lamina_plan({ mode: "revise", priorPlanId, priorPlanFingerprint, answers, interactionVersion, idempotencyKey })`
+
+   Never concatenate answers into a new brief. If it is `awaiting_choice`, show every alternative with its credit/time estimate, let
    the user choose, and call `lamina_choose({ planId, routeId })`. Execute only the chosen plan
    returned as `awaiting_approval`.
+
 4. If the frozen plan is `awaiting_approval`, collect each `requiredInputs[].question` and keep
    those answers for `lamina_execute`; do not re-plan and drift away from the plan the user will
    approve. Do not execute an unresolved or expired plan.
@@ -74,6 +97,26 @@ before using that surface.
 
 Lamina resolves references between plan steps server-side. Do not manually copy an earlier
 output URL into a later step when the frozen plan already contains that binding.
+
+## Revise workflows and completed outputs
+
+Use `mode: "revise"` for every conversational correction, typed answer, or control change. Send
+the exact parent `planId` and `planFingerprint`; stale parents fail closed. The server returns a
+new immutable plan, so the last valid state remains available when feedback cannot be applied.
+
+A completed workflow draft is only a validated preview. Show its graph diff, dependency impact,
+affected outputs, and preserved branches. To save the exact reviewed draft, call:
+
+`lamina_plan({ mode: "prepare_workflow_commit", runId, stepId, draftHash, idempotencyKey })`
+
+Obtain Save approval and execute that commit plan. Saving never means running; plan and approve a
+later workflow run separately.
+
+Completed `lamina_status` outputs carry opaque `outputRef` values. To refine one, call a child
+revision with `resultRef: outputRef` and the user's message. Do not use a client-supplied URL as
+identity. If Lamina asks whether the change applies to only this output or the reusable workflow,
+show those options and submit `outputEditScope`. One-off video timeline edits preserve the source;
+workflow-definition edits produce another workflow draft and require Save approval.
 
 ## Assets
 
