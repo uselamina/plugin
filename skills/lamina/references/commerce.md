@@ -25,12 +25,20 @@ treat this installed reference as a replacement for live app contracts.
 | Branded banners | `commerce_prepare_banners` | Three images and three short animations |
 | Show an actual customer wearing a garment | `commerce_prepare_try_on` | Two images and try-on video |
 | Clothing campaign film | `commerce_prepare_apparel_video` | Final ad film |
-| Other-product campaign film | `commerce_prepare_product_video` | Base and text-overlay ad films |
+| Listing URL and 1–8 product photos | `commerce_prepare_product_video` | One 10-second vertical product ad |
 
 An ambiguous “ad” needs one format question: banner pack or campaign film. Required
 facts may come from the user's existing Shopify connector, files or answers. Do not
 reconnect Shopify to Lamina or invent missing products, logos, people or offers. Each
 tool prepares its complete output pack, including video; there is no image-only switch.
+
+App 6 keeps the legacy key `non_apparel_ad_video`, but now requires `listing_url`
+and an ordered `listing_images` array of 1–8 real image URLs. It requires no logo or
+person preset. Upload local files first; show the supplied photos in the review. Unused
+slots are cleared. The authored app requests four scenes, music and feature text without
+voiceover. It receives the URL as text without verified page retrieval: review product
+claims and visual fidelity, especially when fewer than eight photos are supplied.
+Old product/logo arguments and two-20-second-output expectations no longer apply.
 
 ## Inputs and execution
 

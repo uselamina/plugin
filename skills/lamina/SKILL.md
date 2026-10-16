@@ -203,3 +203,7 @@ instead of silently restarting or charging again.
   `lamina_topup` tool only issues a Stripe-hosted checkout URL.
 - Keep brand/profile changes, app visibility, version restore, feedback, refinement, and
   checkout as explicit advanced actions with user authorization.
+
+For the listing-video app, use `commerce_prepare_product_video` with `listing_url` and
+1–8 ordered `listing_images`. The legacy key is `non_apparel_ad_video`; it returns one
+10-second video. Read its current description and warnings, and show input photos in review.
