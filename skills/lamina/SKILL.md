@@ -17,8 +17,7 @@ media. Never claim “shown above” without a visible preview. If unsupported, 
 named original links and explain the display limitation. Refresh status without
 regenerating. See the Brand reference for paging beyond four thumbnails.
 
-For the six Brand MCP apps (catalogue, listing upgrade, banners, customer try-on,
-apparel film and non-apparel film), use the separate OAuth connection
+For Brand MCP apps, use the separate OAuth connection
 `https://app.uselamina.ai/mcp/commerce`. It is not a sub-tool automatically enabled by
 connecting to the main endpoint. Read [references/commerce.md](references/commerce.md)
 for setup and app selection; obtain current fields and choices from `commerce_describe`.
@@ -32,6 +31,9 @@ Brand MCP person presets/custom photos are not AI-model overrides: internal gene
 models remain fixed. The task-level planner, model-selection recipes and status-card
 polling rules below apply to the main endpoint, not to Brand MCP. Brand MCP requires
 bounded status checks until a terminal response; return its actual final outputs.
+For selected deliverables, pass `output_ids` from the app description during preparation.
+Required upstream steps run automatically. Reuse `retained_inputs` when answering
+missing questions; do not request separate approval for each prerequisite.
 
 ## Connect
 
